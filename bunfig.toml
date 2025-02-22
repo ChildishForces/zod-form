@@ -1,0 +1,2 @@
+[install.scopes]
+childishforces = { token = "$CHILDISHFORCES_TOKEN", url = "https://npm.pkg.github.com" }
