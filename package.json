@@ -1,10 +1,11 @@
 {
   "name": "@childishforces/zod-form",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "repository": "https://github.com/ChildishForces/zod-form.git",
   "scripts": {
     "build": "tsc && bun ./scripts/build.ts"
   },
