@@ -7,7 +7,6 @@ const result = await Bun.build({
   outdir: './dist',
   target: 'node',
   naming: 'index.js',
-  minify: true,
   external: ['react', 'zod', 'immer', 'nanoid'],
 });
 

@@ -1,6 +1,6 @@
 {
   "name": "@childishforces/zod-form",
-  "version": "1.0.2",
+  "version": "1.0.9",
   "description": "",
   "type": "module",
   "main": "dist/index.js",

@@ -2,7 +2,7 @@ import type { AnyZodObject } from 'zod';
 import { ZodForm } from '../classes/ZodForm';
 import { useMemo, useSyncExternalStore } from 'react';
 import { getZodErrors } from '../getZodErrors';
-import type { ErrorMap, Key, Key as OriginalKey } from '../types';
+import type { ErrorMap, Key } from '../types';
 
 interface UseFormErrorsResult<Schema extends AnyZodObject> {
   errors: Record<string, string | undefined>;
@@ -13,15 +13,9 @@ interface UseFormErrorsResult<Schema extends AnyZodObject> {
 export const useFormErrors = <Schema extends AnyZodObject>(
   formContent: ZodForm<Schema>
 ): UseFormErrorsResult<Schema> => {
-  // Types
-  type Key = OriginalKey<Schema>;
-
   // Computed Values
-  const subscribe = useMemo(() => formContent.subscribe, []);
-  const keySubscribe = useMemo(() => formContent.errorKeys.subscribe, []);
-  const shownKeys = useSyncExternalStore(keySubscribe, formContent.errorKeys.getKeys);
-  const error = useSyncExternalStore(subscribe, formContent.getError);
-  const keys = Object.keys(formContent.schema.shape) as Key[];
+  const shownKeys = useSyncExternalStore(formContent.errorKeys.subscribe, formContent.errorKeys.getKeys);
+  const error = useSyncExternalStore(formContent.subscribe, formContent.getError);
 
   const errorFormatted = useMemo(() => {
     if (!error) return null;
@@ -30,18 +24,17 @@ export const useFormErrors = <Schema extends AnyZodObject>(
 
   const errors = useMemo(() => {
     const value: Record<string, string | undefined> = {};
-    if (!formContent.errorMap) return value;
 
-    for (const key of Object.keys(formContent.errorMap)) {
-      if (!shownKeys.has(key) || !errorFormatted?.[key]) continue;
-      value[key] = formContent.errorMap?.[key] ?? errorFormatted?.[key].join(' ');
+    for (const key of shownKeys) {
+      if (!errorFormatted?.[key]) continue;
+      value[key as string] = formContent.errorMap?.[key] ?? errorFormatted?.[key]?.join(' ');
     }
 
     return value as Partial<ErrorMap<Schema>>;
-  }, [keys, errorFormatted]);
+  }, [shownKeys, errorFormatted, formContent.errorMap]);
 
   // Methods
-  const showForKey = (key: Key) => {
+  const showForKey = (key: Key<Schema>) => {
     return () => formContent.errorKeys.addKey(key);
   };
 
