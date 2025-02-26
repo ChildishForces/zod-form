@@ -3,17 +3,24 @@ import type { Key } from '../types';
 import { Emitter } from './Emitter';
 
 export class ErrorKeyCollection<Schema extends AnyZodObject> extends Emitter {
-  private keys: Key<Schema>[] = [];
+  private _keys: Key<Schema>[] = [];
+
+  private set keys(keys: Key<Schema>[]) {
+    this._keys = keys;
+    this.broadcast();
+  }
+
+  private get keys() {
+    return this._keys;
+  }
 
   public addKey = (key: Key<Schema>) => {
     if (this.keys.includes(key)) return;
-    this.keys.push(key);
-    this.broadcast();
+    this.keys = [...this.keys, key];
   };
 
   public resetKeys = () => {
     this.keys = [];
-    this.broadcast();
   };
 
   public getKeys = () => {

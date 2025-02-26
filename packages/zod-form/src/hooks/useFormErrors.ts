@@ -14,7 +14,10 @@ export const useFormErrors = <Schema extends AnyZodObject>(
   formContent: ZodForm<Schema>
 ): UseFormErrorsResult<Schema> => {
   // Computed Values
-  const shownKeys = useSyncExternalStore(formContent.errorKeys.subscribe, formContent.errorKeys.getKeys);
+  const shownKeys = useSyncExternalStore(
+    formContent.errorKeys.subscribe,
+    formContent.errorKeys.getKeys
+  );
   const error = useSyncExternalStore(formContent.subscribe, formContent.getError);
 
   const errorFormatted = useMemo(() => {
@@ -27,7 +30,8 @@ export const useFormErrors = <Schema extends AnyZodObject>(
 
     for (const key of shownKeys) {
       if (!errorFormatted?.[key]) continue;
-      value[key as string] = formContent.errorMap?.[key] ?? errorFormatted?.[key]?.join(' ');
+      value[key as string] =
+        (formContent.errorMap?.[key] ?? errorFormatted?.[key]?.join('. ')) + '.';
     }
 
     return value as Partial<ErrorMap<Schema>>;

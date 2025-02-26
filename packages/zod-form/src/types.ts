@@ -12,7 +12,7 @@ import {
 } from 'zod';
 
 export type Key<Schema extends AnyZodObject> =
-  | keyof z.infer<Schema>
+  | (string & keyof z.infer<Schema>)
   | `${string & keyof z.infer<Schema>}.${string}`;
 
 export type Listener = () => void;

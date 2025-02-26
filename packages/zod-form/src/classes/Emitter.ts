@@ -15,7 +15,9 @@ export class Emitter {
   subscribe = (listeners: Listener) => {
     const id = nanoid();
     this.listeners.set(id, listeners);
-    return () => this.listeners.delete(id);
+    return () => {
+      this.listeners.delete(id);
+    };
   };
 
   /**
