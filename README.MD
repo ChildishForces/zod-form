@@ -77,8 +77,8 @@ has interacted with the input.
 ### Returns
 
 ```ts
-interface UseFormErrorsResult<Schema extends AnyZodObject> {
-  errors: Record<string, string | undefined>;
+interface UseFormErrorsResult<Schema extends z.ZodObject> {
+  errors: Record<string, string[] | undefined>;
   showForKey: (key: Key<Schema>) => () => void;
   resetShownKeys: () => void;
 }
@@ -113,9 +113,7 @@ const FormComponent: React.FC = () => {
 
 #### errors
 
-Record of error paths, and string values. If there is an error string provided for the key path via `errorMap` provided
-in ZodForm constructor, that will be returned if there is an error with the kep path, otherwise it will fall back to
-Zod's error definition.
+Record of error paths, and an array of string values.
 
 #### showForKey
 
