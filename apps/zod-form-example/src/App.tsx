@@ -26,13 +26,13 @@ const image = 'https://picsum.photos/id/519/1200/900';
 
 const form = new ZodForm({
   schema: z.object({
-    email: z.string().email('Email address is invalid'),
+    email: z.email({ error: 'Email address is invalid' }),
     password: z.string().min(5)
-      .regex(/[a-z]/g, 'Must include a lowercase character')
-      .regex(/[A-Z]/g, 'Must include an uppercase character')
-      .regex(/\d/g, 'Must include a number')
+      .regex(/[a-z]/g, { error: 'Must include a lowercase character' })
+      .regex(/[A-Z]/g, { error: 'Must include an uppercase character' })
+      .regex(/\d/g, { error: 'Must include a number' })
       // eslint-disable-next-line no-useless-escape
-      .regex(/[$£€#!\-_\\\[\]{}+=^%@]/g, 'Must include a special character'),
+      .regex(/[$£€#!\-_\\\[\]{}+=^%@]/g, { error: 'Must include a special character' }),
   }),
   initialState: {
     email: '',
