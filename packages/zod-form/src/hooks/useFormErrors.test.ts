@@ -12,12 +12,6 @@ const TEST_FORM_SCHEMA = z.object({
   }),
 });
 
-const ERROR_MAP = {
-  foo: 'TEST_ERROR_ONE',
-  'obj.a': 'TEST_ERROR_TWO',
-  'obj.b': 'TEST_ERROR_THREE',
-};
-
 describe('useFormErrors', () => {
   it('Should return an error if there are errors in the state', () => {
     // Arrange
@@ -25,7 +19,6 @@ describe('useFormErrors', () => {
       schema: TEST_FORM_SCHEMA,
       // @ts-expect-error this is the wrong type
       initialState: { obj: { a: 'Correct', b: 'Incorrect' } },
-      errorMap: ERROR_MAP,
     });
 
     // Act
@@ -41,8 +34,42 @@ describe('useFormErrors', () => {
 
     // Assert
     expect(result.current.errors).toStrictEqual({
-      foo: 'TEST_ERROR_ONE',
-      'obj.b': 'TEST_ERROR_THREE',
+      foo: ['Invalid input: expected "bar"'],
+      'obj.b': ['Invalid input: expected number, received string'],
+    });
+  });
+
+  it('Should return custom errors', () => {
+    // Arrange
+    const TEST_FORM_SCHEMA = z.object({
+      foo: z.literal('bar', { error: "This sure don't look like 'bar'" }),
+      obj: z.object({
+        a: z.string(),
+        b: z.number(),
+      }),
+    });
+
+    const formContent = new ZodForm({
+      schema: TEST_FORM_SCHEMA,
+      // @ts-expect-error this is the wrong type
+      initialState: { obj: { a: 'Correct', b: 'Incorrect' } },
+    });
+
+    // Act
+    const { result, rerender } = renderHook(() => useFormErrors(formContent));
+
+    act(() => {
+      for (const key of ['foo', 'obj.a', 'obj.b'] as const) {
+        result.current.showForKey(key)();
+      }
+
+      rerender();
+    });
+
+    // Assert
+    expect(result.current.errors).toStrictEqual({
+      foo: ["This sure don't look like 'bar'"],
+      'obj.b': ['Invalid input: expected number, received string'],
     });
   });
 
@@ -51,7 +78,6 @@ describe('useFormErrors', () => {
     const formContent = new ZodForm({
       schema: TEST_FORM_SCHEMA,
       initialState: { foo: 'bar', obj: { a: 'Correct', b: 1234 } },
-      errorMap: ERROR_MAP,
     });
 
     // Act
@@ -77,7 +103,6 @@ describe('useFormErrors', () => {
     const formContent = new ZodForm({
       schema: TEST_FORM_SCHEMA,
       initialState: validState,
-      errorMap: ERROR_MAP,
     });
 
     // Act
@@ -99,8 +124,8 @@ describe('useFormErrors', () => {
 
     // Assert
     expect(result.current.errors).toStrictEqual({
-      foo: 'TEST_ERROR_ONE',
-      'obj.b': 'TEST_ERROR_THREE',
+      foo: ['Invalid input: expected "bar"'],
+      'obj.b': ['Invalid input: expected number, received string'],
     });
   });
 
@@ -109,7 +134,6 @@ describe('useFormErrors', () => {
     const formContent = new ZodForm({
       schema: TEST_FORM_SCHEMA,
       initialState: { foo: 'bar', obj: { a: 'Correct', b: 1234 } },
-      errorMap: ERROR_MAP,
     });
 
     // Act

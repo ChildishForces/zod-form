@@ -1,8 +1,8 @@
-import type { AnyZodObject } from 'zod';
+import type { z } from 'zod';
 import type { Key } from '../types';
 import { Emitter } from './Emitter';
 
-export class ErrorKeyCollection<Schema extends AnyZodObject> extends Emitter {
+export class ErrorKeyCollection<Schema extends z.ZodObject> extends Emitter {
   private _keys: Key<Schema>[] = [];
 
   private set keys(keys: Key<Schema>[]) {

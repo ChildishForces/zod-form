@@ -1,16 +1,16 @@
-import type { AnyZodObject } from 'zod';
+import type { z } from 'zod';
 import { ZodForm } from '../classes/ZodForm';
 import { useMemo, useSyncExternalStore } from 'react';
 import { getZodErrors } from '../getZodErrors';
 import type { ErrorMap, Key } from '../types';
 
-interface UseFormErrorsResult<Schema extends AnyZodObject> {
-  errors: Record<string, string | undefined>;
+interface UseFormErrorsResult<Schema extends z.ZodObject> {
+  errors: Record<string, string[] | undefined>;
   showForKey: (key: Key<Schema>) => () => void;
   resetShownKeys: () => void;
 }
 
-export const useFormErrors = <Schema extends AnyZodObject>(
+export const useFormErrors = <Schema extends z.ZodObject>(
   formContent: ZodForm<Schema>
 ): UseFormErrorsResult<Schema> => {
   // Computed Values
@@ -26,12 +26,11 @@ export const useFormErrors = <Schema extends AnyZodObject>(
   }, [error]);
 
   const errors = useMemo(() => {
-    const value: Record<string, string | undefined> = {};
+    const value: Record<string, string[]> = {};
 
     for (const key of shownKeys) {
       if (!errorFormatted?.[key]) continue;
-      value[key as string] =
-        (formContent.errorMap?.[key] ?? errorFormatted?.[key]?.join('. ')) + '.';
+      value[key as string] = errorFormatted?.[key] ?? [];
     }
 
     return value as Partial<ErrorMap<Schema>>;

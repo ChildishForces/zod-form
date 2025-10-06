@@ -1,19 +1,18 @@
 import { ZodForm } from '../classes/ZodForm';
-import { type AnyZodObject, z } from 'zod';
+import { z } from 'zod';
 import { useSyncExternalStore } from 'react';
-import type { ZodDeepPartial } from '../types';
 
-interface UseFormValueSuccessResult<Schema extends AnyZodObject> {
+interface UseFormValueSuccessResult<Schema extends z.ZodObject> {
   state: z.infer<Schema>;
   valid: true;
 }
 
-interface UseFormValueFailureResult<Schema extends AnyZodObject> {
-  state: z.infer<ZodDeepPartial<Schema>>;
+interface UseFormValueFailureResult<Schema extends z.ZodObject> {
+  state: Partial<z.infer<Schema>>;
   valid: false;
 }
 
-type UseFormValueResult<Schema extends AnyZodObject> =
+type UseFormValueResult<Schema extends z.ZodObject> =
   | UseFormValueSuccessResult<Schema>
   | UseFormValueFailureResult<Schema>;
 
@@ -21,11 +20,11 @@ type UseFormValueResult<Schema extends AnyZodObject> =
  * Subscribe to FormContent state
  * @param formContent
  */
-export const useFormValue = <Schema extends AnyZodObject>(
+export const useFormValue = <Schema extends z.ZodObject>(
   formContent: ZodForm<Schema>
 ): UseFormValueResult<Schema> => {
   const state = useSyncExternalStore(formContent.subscribe, formContent.getState);
   const valid = useSyncExternalStore(formContent.subscribe, formContent.getIsValid);
 
-  return { state, valid };
+  return { state, valid } as UseFormValueResult<Schema>;
 };

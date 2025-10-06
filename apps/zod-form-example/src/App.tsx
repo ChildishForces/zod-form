@@ -93,11 +93,11 @@ function App() {
                   onBlur={showForKey('email')}
                   onChange={handleChange('email')}
                 />
-                {errors.email && (
-                  <FormHelperText>
-                    {errors.email}
+                {errors.email?.map((error) => (
+                  <FormHelperText key={error}>
+                    {error}
                   </FormHelperText>
-                )}
+                ))}
               </FormControl>
               <FormControl error={Boolean(errors.password)}>
                 <FormLabel>Password</FormLabel>
@@ -111,11 +111,11 @@ function App() {
                   onChange={handleChange('password')}
                   type="password"
                 />
-                {errors.password && (
-                  <FormHelperText>
-                    {errors.password}
+                {errors.password?.map((error) => (
+                  <FormHelperText key={error}>
+                    {error}
                   </FormHelperText>
-                )}
+                ))}
               </FormControl>
             </Box>
           </CardContent>

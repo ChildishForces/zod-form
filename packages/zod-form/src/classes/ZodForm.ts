@@ -1,20 +1,23 @@
-import { z, AnyZodObject } from 'zod';
+import { z } from 'zod';
 import { produce, Draft } from 'immer';
-import { ErrorMap, ZodDeepPartial } from '../types';
+import { ErrorMap } from '../types';
 import { ErrorKeyCollection } from './ErrorKeyCollection';
 import { Emitter } from './Emitter';
 
-interface FormContentProps<Schema extends AnyZodObject> {
+interface FormContentProps<Schema extends z.ZodObject> {
   schema: Schema;
-  initialState: z.infer<ZodDeepPartial<Schema>>;
+  initialState: Partial<z.infer<Schema>>;
+  /**
+   * @deprecated use Zod's custom messages instead
+   */
   errorMap?: Partial<ErrorMap<Schema>>;
 }
 
-export class ZodForm<Schema extends AnyZodObject> extends Emitter {
+export class ZodForm<Schema extends z.ZodObject> extends Emitter {
   /**
    * Actual form state
    */
-  private state: z.infer<ZodDeepPartial<Schema>>;
+  private state: Partial<z.infer<Schema>>;
 
   /**
    * Optional map of errors to show if a field is invalid
@@ -30,18 +33,17 @@ export class ZodForm<Schema extends AnyZodObject> extends Emitter {
    * Result of safe parse of form state with schema
    * @private
    */
-  public output: z.SafeParseReturnType<z.infer<Schema>, z.infer<Schema>>;
+  public output: z.ZodSafeParseResult<z.infer<Schema>>;
 
   /**
    * Collection of which properties to show errors for
    */
   public errorKeys = new ErrorKeyCollection<Schema>();
 
-  constructor({ schema, initialState, errorMap }: FormContentProps<Schema>) {
+  constructor({ schema, initialState }: FormContentProps<Schema>) {
     super();
     this.schema = schema;
     this.state = initialState;
-    this.errorMap = errorMap;
     this.output = schema.safeParse(initialState);
   }
 
@@ -77,7 +79,7 @@ export class ZodForm<Schema extends AnyZodObject> extends Emitter {
    * });
    * ```
    */
-  public dispatch = (updater: (state: Draft<z.infer<ZodDeepPartial<Schema>>>) => void) => {
+  public dispatch = (updater: (state: Draft<Partial<z.infer<Schema>>>) => void) => {
     this.state = produce(this.state, updater);
     this.output = this.schema.safeParse(this.state);
     this.broadcast();
@@ -94,8 +96,8 @@ export class ZodForm<Schema extends AnyZodObject> extends Emitter {
    * />
    * ```
    */
-  public createBasicSetter = <K extends string & keyof z.infer<ZodDeepPartial<Schema>>>(key: K) => {
-    return (value: z.infer<ZodDeepPartial<Schema>>[K]) => {
+  public createBasicSetter = <K extends string & keyof Partial<z.infer<Schema>>>(key: K) => {
+    return (value: Partial<z.infer<Schema>>[K]) => {
       this.dispatch((state) => {
         if (typeof state === 'object' && key in state) {
           // @ts-expect-error - Some weirdness around Draft + generic
