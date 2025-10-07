@@ -44,7 +44,7 @@ export class ZodForm<Schema extends z.ZodObject> extends Emitter {
    * The initial state of the form
    * @private
    */
-  private initialState: Partial<z.infer<Schema>> = {};
+  private readonly initialState: Partial<z.infer<Schema>> = {};
 
   constructor({ schema, initialState }: FormContentProps<Schema>) {
     super();
@@ -97,6 +97,7 @@ export class ZodForm<Schema extends z.ZodObject> extends Emitter {
    */
   public resetState = () => {
     this.state = this.initialState;
+    this.output = this.schema.safeParse(this.state);
     this.broadcast();
   };
 
