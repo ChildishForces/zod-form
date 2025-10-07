@@ -40,10 +40,17 @@ export class ZodForm<Schema extends z.ZodObject> extends Emitter {
    */
   public errorKeys = new ErrorKeyCollection<Schema>();
 
+  /**
+   * The initial state of the form
+   * @private
+   */
+  private initialState: Partial<z.infer<Schema>> = {};
+
   constructor({ schema, initialState }: FormContentProps<Schema>) {
     super();
     this.schema = schema;
     this.state = initialState;
+    this.initialState = initialState;
     this.output = schema.safeParse(initialState);
   }
 
@@ -82,6 +89,14 @@ export class ZodForm<Schema extends z.ZodObject> extends Emitter {
   public dispatch = (updater: (state: Draft<Partial<z.infer<Schema>>>) => void) => {
     this.state = produce(this.state, updater);
     this.output = this.schema.safeParse(this.state);
+    this.broadcast();
+  };
+
+  /**
+   * Reset the form to it's initial state
+   */
+  public resetState = () => {
+    this.state = this.initialState;
     this.broadcast();
   };
 
