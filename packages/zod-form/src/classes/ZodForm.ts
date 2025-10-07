@@ -98,6 +98,7 @@ export class ZodForm<Schema extends z.ZodObject> extends Emitter {
   public resetState = () => {
     this.state = this.initialState;
     this.output = this.schema.safeParse(this.state);
+    this.errorKeys.resetKeys();
     this.broadcast();
   };
 
