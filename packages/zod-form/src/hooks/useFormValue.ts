@@ -23,8 +23,17 @@ type UseFormValueResult<Schema extends z.ZodObject> =
 export const useFormValue = <Schema extends z.ZodObject>(
   formContent: ZodForm<Schema>
 ): UseFormValueResult<Schema> => {
-  const state = useSyncExternalStore(formContent.subscribe, formContent.getState);
-  const valid = useSyncExternalStore(formContent.subscribe, formContent.getIsValid);
+  const state = useSyncExternalStore(
+    formContent.subscribe,
+    formContent.getState,
+    formContent.getState
+  );
+
+  const valid = useSyncExternalStore(
+    formContent.subscribe,
+    formContent.getIsValid,
+    formContent.getIsValid
+  );
 
   return { state, valid } as UseFormValueResult<Schema>;
 };

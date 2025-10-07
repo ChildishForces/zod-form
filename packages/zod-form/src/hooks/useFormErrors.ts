@@ -16,9 +16,14 @@ export const useFormErrors = <Schema extends z.ZodObject>(
   // Computed Values
   const shownKeys = useSyncExternalStore(
     formContent.errorKeys.subscribe,
+    formContent.errorKeys.getKeys,
     formContent.errorKeys.getKeys
   );
-  const error = useSyncExternalStore(formContent.subscribe, formContent.getError);
+  const error = useSyncExternalStore(
+    formContent.subscribe,
+    formContent.getError,
+    formContent.getError
+  );
 
   const errorFormatted = useMemo(() => {
     if (!error) return null;
